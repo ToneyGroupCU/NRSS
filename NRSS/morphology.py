@@ -1,6 +1,6 @@
 import h5py
 # import pathlib
-import CyRSoXS as cy
+# import CyRSoXS as cy
 import warnings
 from .checkH5 import check_NumMat
 from .reader import read_material, read_config
@@ -67,20 +67,20 @@ class Morphology:
         further analysis
     '''
 
-    # dict to deal with specific CyRSoXS input objects. dict structure inspired from David Ackerman's cyrsoxs-framework
-    input_mapping = {'CaseType': ['setCaseType',[cy.CaseType.Default, cy.CaseType.BeamDivergence, cy.CaseType.GrazingIncidence]],
-                     'MorphologyType': ['setMorphologyType', [cy.MorphologyType.EulerAngles, cy.MorphologyType.VectorMorphology]],
-                     'EwaldsInterpolation': ['interpolationType', [cy.InterpolationType.NearestNeighour, cy.InterpolationType.Linear]],
-                     'WindowingType': ['windowingType', [cy.FFTWindowing.NoPadding, cy.FFTWindowing.Hanning]],
-                     'RotMask': ['rotMask', [False, True]],
-                     'AlgorithmType': ['setAlgorithm', [0, 1]],
-                     'ReferenceFrame': ['referenceFrame', [0, 1]]}
+    # # dict to deal with specific CyRSoXS input objects. dict structure inspired from David Ackerman's cyrsoxs-framework
+    # input_mapping = {'CaseType': ['setCaseType',[cy.CaseType.Default, cy.CaseType.BeamDivergence, cy.CaseType.GrazingIncidence]],
+    #                  'MorphologyType': ['setMorphologyType', [cy.MorphologyType.EulerAngles, cy.MorphologyType.VectorMorphology]],
+    #                  'EwaldsInterpolation': ['interpolationType', [cy.InterpolationType.NearestNeighour, cy.InterpolationType.Linear]],
+    #                  'WindowingType': ['windowingType', [cy.FFTWindowing.NoPadding, cy.FFTWindowing.Hanning]],
+    #                  'RotMask': ['rotMask', [False, True]],
+    #                  'AlgorithmType': ['setAlgorithm', [0, 1]],
+    #                  'ReferenceFrame': ['referenceFrame', [0, 1]]}
 
-    config_default = {'CaseType': 0, 'Energies': [270.0], 'EAngleRotation': [0.0, 1.0, 0.0],
-                      'MorphologyType': 0, 'AlgorithmType': 0, 'WindowingType': 0,
-                      'RotMask': 0,
-                      'ReferenceFrame': 1,
-                      'EwaldsInterpolation': 1}
+    # config_default = {'CaseType': 0, 'Energies': [270.0], 'EAngleRotation': [0.0, 1.0, 0.0],
+    #                   'MorphologyType': 0, 'AlgorithmType': 0, 'WindowingType': 0,
+    #                   'RotMask': 0,
+    #                   'ReferenceFrame': 1,
+    #                   'EwaldsInterpolation': 1}
 
     def __init__(self, numMaterial, materials=None, PhysSize=None,
                  config={'CaseType': 0, 'MorphologyType': 0, 'Energies': [270.0], 'EAngleRotation': [0.0, 1.0, 0.0]}, create_cy_object=True):
@@ -319,28 +319,28 @@ class Morphology:
     def load_matfile(self, matfile):
         return read_material(matfile)
 
-    def create_inputData(self):
-        self.inputData = cy.InputData(NumMaterial=self._numMaterial)
-        # parse config dictionary and assign to appropriate places in inputData object
-        self.config_to_inputData()
+    # def create_inputData(self):
+    #     self.inputData = cy.InputData(NumMaterial=self._numMaterial)
+    #     # parse config dictionary and assign to appropriate places in inputData object
+    #     self.config_to_inputData()
 
-        if self.NumZYX is None:
-            self.NumZYX = self.materials[1].NumZYX
+    #     if self.NumZYX is None:
+    #         self.NumZYX = self.materials[1].NumZYX
 
-        # only support ZYX ordering at the moment
-        self.inputData.setDimensions(self.NumZYX, cy.MorphologyOrder.ZYX)
+    #     # only support ZYX ordering at the moment
+    #     self.inputData.setDimensions(self.NumZYX, cy.MorphologyOrder.ZYX)
 
-        if self.PhysSize is not None:
-            self.inputData.setPhysSize(self.PhysSize)
+    #     if self.PhysSize is not None:
+    #         self.inputData.setPhysSize(self.PhysSize)
 
-        if not self.inputData.validate():
-            warnings.warn('Validation failed. Double check inputData values')
+    #     if not self.inputData.validate():
+    #         warnings.warn('Validation failed. Double check inputData values')
 
-    def create_optical_constants(self):
-        self.OpticalConstants = cy.RefractiveIndex(self.inputData)
-        self.update_optical_constants()        
-        if not self.OpticalConstants.validate():
-            warnings.warn('Validation failed. Double check optical constant values')
+    # def create_optical_constants(self):
+    #     self.OpticalConstants = cy.RefractiveIndex(self.inputData)
+    #     self.update_optical_constants()        
+    #     if not self.OpticalConstants.validate():
+    #         warnings.warn('Validation failed. Double check optical constant values')
 
     def update_optical_constants(self):
         for energy in self.Energies:
@@ -349,11 +349,11 @@ class Morphology:
                 all_constants.append(self.materials[ID].opt_constants[energy])
             self.OpticalConstants.addData(OpticalConstants=all_constants, Energy=energy)
 
-    def create_voxel_data(self):
-        self.voxelData = cy.VoxelData(InputData=self.inputData)
-        self.update_voxel_data()
-        if not self.voxelData.validate():
-            warnings.warn('Validation failed. Double check voxel data values')
+    # def create_voxel_data(self):
+    #     self.voxelData = cy.VoxelData(InputData=self.inputData)
+    #     self.update_voxel_data()
+    #     if not self.voxelData.validate():
+    #         warnings.warn('Validation failed. Double check voxel data values')
 
     def update_voxel_data(self):
         for ID in range(1, self.numMaterial+1):
@@ -422,22 +422,22 @@ class Morphology:
         for i in range(1, self._numMaterial+1):
             write_opts(self.materials[i].opt_constants, i, path)
 
-    # submit to CyRSoXS
-    def run(self, stdout=True, stderr=True, return_xarray=True, print_vec_info=False):
+    # # submit to CyRSoXS
+    # def run(self, stdout=True, stderr=True, return_xarray=True, print_vec_info=False):
 
-        self.create_update_cy()
+    #     self.create_update_cy()
 
-        # if we haven't created a ScatteringPattern object, create it now
-        if not self.scatteringPattern:
-            self.scatteringPattern = cy.ScatteringPattern(self.inputData)
-        with cy.ostream_redirect(stdout=stdout, stderr=stderr):
-            cy.launch(VoxelData=self.voxelData,
-                      RefractiveIndexData=self.OpticalConstants,
-                      InputData=self.inputData,
-                      ScatteringPattern=self.scatteringPattern)
-        self._simulated = True
-        if return_xarray:
-            return self.scattering_to_xarray(return_xarray=return_xarray, print_vec_info=print_vec_info)
+    #     # if we haven't created a ScatteringPattern object, create it now
+    #     if not self.scatteringPattern:
+    #         self.scatteringPattern = cy.ScatteringPattern(self.inputData)
+    #     with cy.ostream_redirect(stdout=stdout, stderr=stderr):
+    #         cy.launch(VoxelData=self.voxelData,
+    #                   RefractiveIndexData=self.OpticalConstants,
+    #                   InputData=self.inputData,
+    #                   ScatteringPattern=self.scatteringPattern)
+    #     self._simulated = True
+    #     if return_xarray:
+    #         return self.scattering_to_xarray(return_xarray=return_xarray, print_vec_info=print_vec_info)
 
     def scattering_to_xarray(self, return_xarray=True, print_vec_info=False):
         if self.simulated:
