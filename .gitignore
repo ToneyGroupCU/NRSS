@@ -17,3 +17,4 @@ tests/validation/lib/__pycache__
 tests/validation/*.log
 .ipynb_checkpoints
 NRSS/.ipynb_checkpoints
+slurm*
